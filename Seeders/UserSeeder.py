@@ -1,14 +1,17 @@
 from faker import Faker
 import pandas as pd
+import mariadb
 from LensSeeder import LensSeeder
+from ContentSeeder import ContentSeeder
 faker = Faker(['en_US','ja_JP','id_ID'])
 
 ENTITY_TABLE_ROWS = 30
 FOREIGN_TABLE_ROWS = 50
 class UserSeeder:
-    def __init__(self, db):
-        self.db = db
-        self.lens_seeder = LensSeeder(db)
+    def __init__(self, cursor):
+        self.cursor = cursor
+        self.lens_seeder = LensSeeder(cursor)
+        self.content_seeder = ContentSeeder(cursor)
         self.user_count = 0
 
     def run(self):
@@ -38,6 +41,23 @@ class UserSeeder:
         self.seed_papmap_table(user_df)
         self.seed_berteman_table(user_df)
         # Insert into the database
+        for _, row in user_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Pengguna (id-user, id-level, email, username, no-telp, tanggal-lahir, tanggal-pembuatan, password)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    row['id-user'],
+                    row['id-level'],
+                    row['email'],
+                    row['username'],
+                    row['no-telp'],
+                    row['tanggal-lahir'],
+                    row['tanggal-pembuatan'],
+                    row['password'],
+                )
+            )
     
     def seed_level_table(self):
         print("Seeding level...")
@@ -48,12 +68,25 @@ class UserSeeder:
         # Convert to DataFrame
         level_df =  pd.DataFrame(levels)
         # Insert into the database
+        for _, row in level_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Level (id-level, nama-level, upah, minimum-lensa)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (
+                    row['id-level'],
+                    row['nama-level'],
+                    row['upah'],
+                    row['minimum-lensa'],
+                )
+            )
 
     def seed_papmap_table(self,user_table:pd.DataFrame):
         print("Seeding papmap...")
         papmap = []
         for i in user_table:
-            n_entries = faker.random_int(min=1, max=5)
+            n_entries = faker.random_int(min=2, max=5)
             timestamps = []
             for j in range(n_entries):
                 date = faker.date_between(start_date=i['tanggal-pembuatan'], end_date='today')
@@ -87,12 +120,27 @@ class UserSeeder:
         # Convert to DataFrame
         papmap_df =  pd.DataFrame(papmap)
         # Insert into the database
+        for _, row in papmap_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO PapMap (waktu_mulai, waktu_akhir, `id-user`, longitude, latitude, status)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    row['waktu_mulai'],
+                    row['waktu_akhir'],
+                    row['id-user'],
+                    row['longitude'],
+                    row['latitude'],
+                    row['status'],
+                )
+            )
 
     def seed_berteman_table(self,user_table:pd.DataFrame):
         print("Seeding berteman...")
         berteman = []
         for i in user_table:
-            n_friends = faker.random_int(min=1, max=5)
+            n_friends = faker.random_int(min=3, max=6)
             for j in range(n_friends):
                 friend = {
                     'id-user': i['id-user'],
@@ -111,17 +159,56 @@ class UserSeeder:
         # Convert to DataFrame
         berteman_df =  pd.DataFrame(berteman)
         # Insert into the database
+        for _, row in berteman_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Berteman (id-user, id-user-teman)
+                VALUES (%s, %s)
+                """,
+                (
+                    row['id-user'],
+                    row['id-user-teman'],
+                )
+            )
 
     def seed_premium_table(self,user_table:pd.DataFrame):
         print("Seeding premium...")
         premium = []
         for i in user_table:
-            subscription ={
-                #WIP
-            }
+            n_entries = faker.random_int(min=0, max=3)
+            start_1 = faker.date_between(start_date=i['tanggal-pembuatan'], end_date='today')
+            end_1 = faker.date_between(start_date=start_1, end_date='today')
+            for j in range(n_entries):
+                start_2 = faker.date_between(start_date=end_1, end_date='today')
+                end_2 = faker.date_between(start_date=start_2, end_date='today')
+                premium_entry = {
+                    'subscription-number': j+1,
+                    'id-user': i['id-user'],
+                    'tanggal-subscribe': start_1,
+                    'tanggal-expire': end_1,
+                    'status': faker.random_element(elements=["active", "inactive"]),
+                }
+                premium.append(premium_entry)
+                start_1 = start_2
+                end_1 = end_2
+                
         # Convert to DataFrame
         premium_df =  pd.DataFrame(premium)
         # Insert into the database
+        for _, row in premium_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Premium (subscription-number, `id-user`, tanggal-subscribe, tanggal-expire, status)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (
+                    row['subscription-number'],
+                    row['id-user'],
+                    row['tanggal-subscribe'],
+                    row['tanggal-expire'],
+                    row['status'],
+                )
+            )
     def seed_room_chat_table(self):
         print("Seeding room chat...")
         room_chat = []
@@ -135,6 +222,18 @@ class UserSeeder:
         # Convert to DataFrame
         room_chat_df =  pd.DataFrame(room_chat)
         # Insert into the database
+        for _, row in room_chat_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO RoomChat (id-room-chat, nama-room-chat, tanggal-pembuatan)
+                VALUES (%s, %s, %s)
+                """,
+                (
+                    row['id-room-chat'],
+                    row['nama-room-chat'],
+                    row['tanggal-pembuatan'],
+                )
+            )
     def seed_tergabung_dalam_table(self,user_df,room_chat_df):
         print("Seeding tergabung dalam...")
         tergabung_dalam = []
@@ -158,3 +257,15 @@ class UserSeeder:
         # Convert to DataFrame
         tergabung_dalam_df =  pd.DataFrame(tergabung_dalam)
         # Insert into the database
+        for _, row in tergabung_dalam_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Tergabung_Dalam (id-user, id-room-chat, tanggal-bergabung)
+                VALUES (%s, %s, %s)
+                """,
+                (
+                    row['id-user'],
+                    row['id-room-chat'],
+                    row['tanggal-bergabung'],
+                )
+            )

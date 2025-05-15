@@ -6,10 +6,10 @@ FOREIGN_TABLE_ROWS = 50
 class ContentSeeder:
     # TO DO: call other seeds inside func
     
-    def __init__(self, db):
-        self.db = db
+    def __init__(self, cursor):
+        self.cursor = cursor
         self.content_count = 0
-        
+    
     def seed_content_table(self, tergabung_dalam_table:pd.DataFrame):
         print("Seeding content...")
         contents = []

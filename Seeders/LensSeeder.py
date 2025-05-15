@@ -1,5 +1,6 @@
 from faker import Faker
 import pandas as pd
+import mariadb
 ENTITY_TABLE_ROWS = 30
 FOREIGN_TABLE_ROWS = 50
 RANDOM_STATE = 34
@@ -8,8 +9,8 @@ faker = Faker(['en_US','ja_JP','id_ID'])
 Faker.seed(RANDOM_STATE)
 
 class LensSeeder:
-    def __init__(self, db):
-        self.db = db
+    def __init__(self, cursor):
+        self.cursor = cursor
         self.lens_count = 0
 
     def seed_lens_table(self,user_table:pd.DataFrame):
@@ -35,10 +36,14 @@ class LensSeeder:
         # Convert to DataFrame
         lens_df =  pd.DataFrame(lenses)
         self.lens_count = len(lenses)
-        # Insert into the database
 
         # create tipe_lensa table
         self.seed_tipe_lensa_table()
+        # Insert into the database
+        for _, row in lens_df.iterrows():
+            sql = "INSERT INTO Lens (id-lens,id-user,nama-lens,tanggal-rilis) VALUES (%s, %s, %s, %s)"
+            val = (row['id-lens'], row['id-user'], row['nama-lens'], row['tanggal-rilis'])
+            self.cursor.execute(sql, val)
         
     def seed_tipe_lensa_table(self):
         print("Seeding tipe_lensa...")
@@ -53,3 +58,7 @@ class LensSeeder:
         # Convert to DataFrame
         tipe_lensa_df =  pd.DataFrame(tipe_lensa)
         # Insert into the database
+        for _, row in tipe_lensa_df.iterrows():
+            sql = "INSERT INTO TipeLensa (id-lens,tipe-lensa) VALUES (%s, %s)"
+            val = (row['id-lens'], row['tipe-lensa'])
+            self.cursor.execute(sql, val)
