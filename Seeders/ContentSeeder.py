@@ -23,15 +23,15 @@ class ContentSeeder:
                     if len(contents) >= 50:
                         break
                     
-                    date = faker.date_between(start_date=i['tanggal-pembuatan'], end_date='today')
+                    date = faker.date_between(start_date=i['tanggal_pembuatan'], end_date='today')
                     tipe = faker.random_element(['pap', 'chat'])
                     saved = faker.pybool()
                     content = {
-                        'urutan-pengiriman': j,
-                        'id-room-chat': i['id-room-chat'],
-                        'id-user': i['id-user'],
+                        'urutan_pengiriman': j,
+                        'id_room_chat': i['id_room_chat'],
+                        'id_user': i['id_user'],
                         'waktu-pembuatan': date,
-                        'tipe-konten': tipe,
+                        'tipe_konten': tipe,
                         'disimpan': saved
                     }
                     contents.append(content)
@@ -45,15 +45,15 @@ class ContentSeeder:
         for _, row in content_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO Konten (urutan-pengiriman, id-room-chat, id-user, waktu-pengiriman, tipe-konten, disimpan)
+                INSERT INTO Konten (urutan_pengiriman, id_room_chat, id_user, waktu_pengiriman, tipe_konten, disimpan)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """,
                 (
-                    row['urutan-pengiriman'],
-                    row['id-room-chat'],
-                    row['id-user'],
-                    row['waktu-pengiriman'],
-                    row['tipe-konten'],
+                    row['urutan_pengiriman'],
+                    row['id_room_chat'],
+                    row['id_user'],
+                    row['waktu_pengiriman'],
+                    row['tipe_konten'],
                     row['disimpan']
                 )
             )
@@ -62,12 +62,12 @@ class ContentSeeder:
         print("Seeding chat...")
         chats = []
         for _,i in konten_table.iterrows():
-            if i['tipe-konten'] == "chat":
+            if i['tipe_konten'] == "chat":
                 chat = {
-                    'urutan-pengiriman' : i['urutan-pengiriman'],
-                    'id-room-chat' : i['id-room-chat'],
-                    'id-user' : i['id-user'],
-                    'isi-pesan' : faker.text()
+                    'urutan_pengiriman' : i['urutan_pengiriman'],
+                    'id_room_chat' : i['id_room_chat'],
+                    'id_user' : i['id_user'],
+                    'isi_pesan' : faker.text()
                 }
                 chats.append(chat)
         # Convert to DataFrame
@@ -76,23 +76,23 @@ class ContentSeeder:
         for _, row in chat_df.interrows():
             self.cursor.execute(
                 """
-                INSERT INTO Chat (urutan-pengiriman, id-room-chat, id-user, isi-pesan)
+                INSERT INTO Chat (urutan_pengiriman, id_room_chat, id_user, isi_pesan)
                 VALUES (%s, %s, %s, %s)
                 """,
                 (
-                    row['urutan-pengiriman'],
-                    row['id-room-chat'],
-                    row['id-user'],
-                    row['isi-pesan']
+                    row['urutan_pengiriman'],
+                    row['id_room_chat'],
+                    row['id_user'],
+                    row['isi_pesan']
                 )
             )
     
     def seed_pap_table(self, konten_table: pd.DataFrame, lens_table: pd.DataFrame):
         print("Seeding pap...")
-        lens_ids = lens_table['id-lens'].tolist()
+        lens_ids = lens_table['id_lens'].tolist()
         paps = []
         for _,i in konten_table.iterrows():
-            if i['tipe-konten'] == "pap":
+            if i['tipe_konten'] == "pap":
                 type = faker.random_element(['video', 'foto'])
                 if type == 'video':
                     duration = faker.random_int(min = 1, max = 60)
@@ -101,11 +101,11 @@ class ContentSeeder:
                 random_idx = faker.random_int(min=0, max=len(lens_ids)-1)
                 id_lens = lens_ids[random_idx]
                 pap = {
-                    'urutan-pengiriman' : i['urutan-pengiriman'],
-                    'id-room-chat' : i['id-room-chat'],
-                    'id-user' : i['id-user'],
-                    'id-lens' : id_lens,
-                    'tipe-pap': type,
+                    'urutan_pengiriman' : i['urutan_pengiriman'],
+                    'id_room_chat' : i['id_room_chat'],
+                    'id_user' : i['id_user'],
+                    'id_lens' : id_lens,
+                    'tipe_pap': type,
                     'durasi'  :duration
                 }
                 paps.append(pap)
@@ -117,15 +117,15 @@ class ContentSeeder:
         for _,row in pap_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO Pap (urutan-pengiriman, id-room-chat, id-user, id-lens, tipe-pap, durasi)
+                INSERT INTO Pap (urutan_pengiriman, id_room_chat, id_user, id_lens, tipe_pap, durasi)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """,
                 (
-                    row['urutan-pengiriman'],
-                    row['id-room-chat'],
-                    row['id-user'],
-                    row['id-lens'],
-                    row['tipe-pap'],
+                    row['urutan_pengiriman'],
+                    row['id_room_chat'],
+                    row['id_user'],
+                    row['id_lens'],
+                    row['tipe_pap'],
                     row['durasi']
                 )
             )
@@ -142,15 +142,15 @@ class ContentSeeder:
             y_end = faker.random_int(min=y_start, max=image_height)
             type = faker.random_element(['image', 'caption'])
             add_on = {
-                'id-add-on' : len(add_ons) + 1,
-                'urutan-pengiriman' : i['urutan-pengiriman'],
-                'id-room-chat' : i['id-room-chat'],
-                'id-user' : i['id-user'],
-                'x-awal' : x_start,
-                'x-akhir' : x_end,
-                'y-awal' : y_start,
-                'y-akhir' : y_end,
-                'tipe-add-on': type,
+                'id_add_on' : len(add_ons) + 1,
+                'urutan_pengiriman' : i['urutan_pengiriman'],
+                'id_room_chat' : i['id_room_chat'],
+                'id_user' : i['id_user'],
+                'x_awal' : x_start,
+                'x_akhir' : x_end,
+                'y_awal' : y_start,
+                'y_akhir' : y_end,
+                'tipe_add_on': type,
             }
             add_ons.append(add_on)
         # Convert to DataFrame
@@ -162,19 +162,19 @@ class ContentSeeder:
         for _, row in add_on_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO AddOn (id-add-on, urutan-pengiriman, id-room-chat, id-user, x-awal, x-akhir, y-awal, y-akhir, tipe-add-on)
+                INSERT INTO AddOn (id_add_on, urutan_pengiriman, id_room_chat, id_user, x_awal, x_akhir, y_awal, y_akhir, tipe_add_on)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
-                    row['id-add-on'],
-                    row['urutan-pengiriman'],
-                    row['id-room-chat'],
-                    row['id-user'],
-                    row['x-awal'],
-                    row['x-akhir'],
-                    row['y-awal'],
-                    row['y-akhir'],
-                    row['tipe-add-on']
+                    row['id_add_on'],
+                    row['urutan_pengiriman'],
+                    row['id_room_chat'],
+                    row['id_user'],
+                    row['x_awal'],
+                    row['x_akhir'],
+                    row['y_awal'],
+                    row['y_akhir'],
+                    row['tipe_add_on']
                 )
             )
 
@@ -184,9 +184,9 @@ class ContentSeeder:
         fonts = ["Arial", "Helvetica", "Roboto", "Open Sans", "Lato", "Montserrat",
                  "Poppins", "Noto Sans", "Fira Sans"]
         for _,i in add_on_table.iterrows():
-            if i['tipe-add-on'] == "caption":
+            if i['tipe_add_on'] == "caption":
                 caption = {
-                    'id-add-on' : i['id-add-on'],
+                    'id_add_on' : i['id_add_on'],
                     'font-style' : faker.random_element(fonts),
                     'teks' : faker.text()
                 }
@@ -197,11 +197,11 @@ class ContentSeeder:
         for _, row in caption_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO Caption (id-add-on, font-style, teks)
+                INSERT INTO Caption (id_add_on, font-style, teks)
                 VALUES (%s, %s, %s)
                 """,
                 (
-                    row['id-add-on'],
+                    row['id_add_on'],
                     row['font-style'],
                     row['teks']
                 )
@@ -211,10 +211,10 @@ class ContentSeeder:
         print("Seeding image...")
         images = []
         for _,i in add_on_table.iterrows():
-            if i['tipe-add-on'] == "image":
+            if i['tipe_add_on'] == "image":
                 image_url = faker.image_url(width=640, height=480)
                 image = {
-                    'id-add-on' : i['id-add-on'],
+                    'id_add_on' : i['id_add_on'],
                     'nama-image' : image_url
                 }
                 images.append(image)
@@ -224,11 +224,11 @@ class ContentSeeder:
         for _, row in content_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO Image (id-add-on, nama-image)
+                INSERT INTO Image (id_add_on, nama-image)
                 VALUES (%s, %s)
                 """,
                 (
-                    row['id-add-on'],
+                    row['id_add_on'],
                     row['nama-image']
                 )
             )
