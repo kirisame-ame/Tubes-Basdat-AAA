@@ -122,3 +122,39 @@ class UserSeeder:
         # Convert to DataFrame
         premium_df =  pd.DataFrame(premium)
         # Insert into the database
+    def seed_room_chat_table(self):
+        print("Seeding room chat...")
+        room_chat = []
+        for j in range(ENTITY_TABLE_ROWS):
+            room = {
+                'id-room-chat': j,
+                'nama-room-chat': faker.text(max_nb_chars=20),
+                'tanggal-pembuatan': faker.date_between(start_date='-3y', end_date='today'),
+            }
+            room_chat.append(room)
+        # Convert to DataFrame
+        room_chat_df =  pd.DataFrame(room_chat)
+        # Insert into the database
+    def seed_tergabung_dalam_table(self,user_df,room_chat_df):
+        print("Seeding tergabung dalam...")
+        tergabung_dalam = []
+        for i in user_df:
+            n_rooms = faker.random_int(min=1, max=5)
+            for j in range(n_rooms):
+                # 5 tries to find a valid room
+                for k in range(5):
+                    room_id = faker.random_int(min=0, max=room_chat_df.shape[0]-1)
+                    if room_chat_df.loc(room_id)['tanggal-pembuatan'] < i['tanggal-pembuatan']:
+                        continue
+                    else:
+                        room = {
+                            'id-user': i['id-user'],
+                            'id-room-chat': room_id,
+                            'tanggal-bergabung': faker.date_between(start_date=room_chat_df.loc(room_id)['tanggal-pembuatan'], 
+                                                                    end_date='today'),
+                        }
+                        tergabung_dalam.append(room)
+                        break
+        # Convert to DataFrame
+        tergabung_dalam_df =  pd.DataFrame(tergabung_dalam)
+        # Insert into the database
