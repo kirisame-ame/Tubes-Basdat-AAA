@@ -42,6 +42,21 @@ class ContentSeeder:
         self.seed_chat_table(content_df)
         self.seed_pap_table(content_df)
         # Insert into the database
+        for _, row in content_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Konten (urutan-pengiriman, id-room-chat, id-user, waktu-pengiriman, tipe-konten, disimpan)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    row['urutan-pengiriman'],
+                    row['id-room-chat'],
+                    row['id-user'],
+                    row['waktu-pengiriman'],
+                    row['tipe-konten'],
+                    row['disimpan']
+                )
+            )
     
     def seed_chat_table(self, konten_table:pd.DataFrame):
         print("Seeding chat...")
@@ -58,6 +73,19 @@ class ContentSeeder:
         # Convert to DataFrame
         chat_df = pd.DataFrame(chats)
         # Insert into the database
+        for _, row in chat_df.interrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Chat (urutan-pengiriman, id-room-chat, id-user, isi-pesan)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (
+                    row['urutan-pengiriman'],
+                    row['id-room-chat'],
+                    row['id-user'],
+                    row['isi-pesan']
+                )
+            )
     
     def seed_pap_table(self, konten_table: pd.DataFrame, lens_table: pd.DataFrame):
         print("Seeding pap...")
@@ -86,6 +114,21 @@ class ContentSeeder:
         # call other seeder
         self.seed_add_on_table(pap_df)
         # Insert into the database
+        for _,row in pap_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Pap (urutan-pengiriman, id-room-chat, id-user, id-lens, tipe-pap, durasi)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    row['urutan-pengiriman'],
+                    row['id-room-chat'],
+                    row['id-user'],
+                    row['id-lens'],
+                    row['tipe-pap'],
+                    row['durasi']
+                )
+            )
         
     def seed_add_on_table(self, pap_table:pd.DataFrame):
         print("Seeding add on...")
@@ -116,6 +159,24 @@ class ContentSeeder:
         self.seed_image_table(add_on_df)
         self.seed_caption_table(add_on_df)
         # Insert into the database
+        for _, row in add_on_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO AddOn (id-add-on, urutan-pengiriman, id-room-chat, id-user, x-awal, x-akhir, y-awal, y-akhir, tipe-add-on)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    row['id-add-on'],
+                    row['urutan-pengiriman'],
+                    row['id-room-chat'],
+                    row['id-user'],
+                    row['x-awal'],
+                    row['x-akhir'],
+                    row['y-awal'],
+                    row['y-akhir'],
+                    row['tipe-add-on']
+                )
+            )
 
     def seed_caption_table(self, add_on_table: pd.DataFrame):
         print("Seeding caption...")
@@ -133,6 +194,18 @@ class ContentSeeder:
         # Convert to DataFrame
         caption_df = pd.DataFrame(captions)
         # Insert into the database
+        for _, row in caption_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Caption (id-add-on, font-style, teks)
+                VALUES (%s, %s, %s)
+                """,
+                (
+                    row['id-add-on'],
+                    row['font-style'],
+                    row['teks']
+                )
+            )
         
     def seed_image_table(self, add_on_table: pd.DataFrame):
         print("Seeding image...")
@@ -148,6 +221,17 @@ class ContentSeeder:
         # Convert to DataFrame
         content_df = pd.DataFrame(images)
         # Insert into the database
+        for _, row in content_df.iterrows():
+            self.cursor.execute(
+                """
+                INSERT INTO Image (id-add-on, nama-image)
+                VALUES (%s, %s)
+                """,
+                (
+                    row['id-add-on'],
+                    row['nama-image']
+                )
+            )
         
         
     
