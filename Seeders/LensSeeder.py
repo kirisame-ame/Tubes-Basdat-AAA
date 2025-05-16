@@ -12,7 +12,6 @@ class LensSeeder:
     def __init__(self, cursor):
         self.cursor = cursor
         self.lens_count = 0
-        self.lens_id_map = []  # To map DataFrame index to DB id_lens
 
     def seed_lens_table(self, user_table: pd.DataFrame):
         print("Seeding lenses...")
@@ -35,7 +34,6 @@ class LensSeeder:
                 lenses.append(lens)
         lens_df = pd.DataFrame(lenses)
         self.lens_count = len(lenses)
-        self.lens_id_map = []
         # Insert into the database and collect DB-generated id_lens
         for _, row in lens_df.iterrows():
             sql = "INSERT INTO Lens (id_user, nama_lens, tanggal_rilis) VALUES (%s, %s, %s)"
@@ -48,9 +46,9 @@ class LensSeeder:
         print("Seeding tipe_lensa...")
         types = ["face", "background", "both", "none"]
         tipe_lensa = []
-        for id_lens in self.lens_id_map:
+        for id_lens in range(self.lens_count):
             tipe = {
-                'id_lens': id_lens,
+                'id_lens': id_lens+1,
                 'tipe_lensa': faker.random_element(elements=types),
             }
             tipe_lensa.append(tipe)
