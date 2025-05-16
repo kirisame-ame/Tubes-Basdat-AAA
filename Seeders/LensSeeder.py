@@ -1,8 +1,8 @@
 from faker import Faker
 import pandas as pd
 import mariadb
-ENTITY_TABLE_ROWS = 30
-FOREIGN_TABLE_ROWS = 50
+ENTITY_TABLE_ROWS = 50
+FOREIGN_TABLE_ROWS = 100
 RANDOM_STATE = 34
 
 faker = Faker(['en_US','ja_JP','id_ID'])

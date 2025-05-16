@@ -2,7 +2,7 @@ from faker import Faker
 import pandas as pd
 faker = Faker(['en_US','ja_JP','id_ID'])
 
-FOREIGN_TABLE_ROWS = 50
+FOREIGN_TABLE_ROWS = 100
 class ContentSeeder:
     def __init__(self, cursor):
         self.cursor = cursor
@@ -11,13 +11,13 @@ class ContentSeeder:
     def seed_content_table(self, tergabung_dalam_table: pd.DataFrame, lens_count: int):
         print("Seeding content...")
         contents = []
-        while len(contents) < 50:
+        while len(contents) < FOREIGN_TABLE_ROWS:
             for _, i in tergabung_dalam_table.iterrows():
-                if len(contents) >= 50:
+                if len(contents) >= FOREIGN_TABLE_ROWS:
                     break
                 n_contents = faker.random_int(min=0, max=5)
                 for _ in range(n_contents):
-                    if len(contents) >= 50:
+                    if len(contents) >= FOREIGN_TABLE_ROWS:
                         break
                     date = faker.date_between(start_date=i['tanggal_bergabung'], end_date='today')
                     tipe = faker.random_element(['pap', 'chat'])

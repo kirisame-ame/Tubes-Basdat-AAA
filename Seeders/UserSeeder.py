@@ -5,8 +5,8 @@ from Seeders.LensSeeder import LensSeeder
 from Seeders.ContentSeeder import ContentSeeder
 faker = Faker(['en_US','ja_JP','id_ID'])
 
-ENTITY_TABLE_ROWS = 30
-FOREIGN_TABLE_ROWS = 50
+ENTITY_TABLE_ROWS = 50
+FOREIGN_TABLE_ROWS = 100
 class UserSeeder:
     def __init__(self, cursor):
         self.cursor = cursor
