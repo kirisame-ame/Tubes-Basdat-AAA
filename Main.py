@@ -8,4 +8,4 @@ if __name__ == "__main__":
                            os.getenv("DB_USER"),
                            os.getenv("DB_PASSWORD"),
                            os.getenv("DB_NAME"))
-    seeder.run()
+    seeder.run(refresh=True)

@@ -1,9 +1,10 @@
+DROP DATABASE IF EXISTS Papchat;
 CREATE DATABASE IF NOT EXISTS Papchat;
 USE Papchat;
 
 -- Tabel Level
 CREATE TABLE Level (
-    id_level INT AUTO_INCREMENT PRIMARY KEY,
+    id_level INT PRIMARY KEY,
     nama_level VARCHAR(100) NOT NULL,
     upah INT NOT NULL,
     minimum_lensa INT NOT NULL
@@ -153,5 +154,5 @@ CREATE TABLE Caption (
     id_add_on INT PRIMARY KEY NOT NULL,
     font_style VARCHAR(100),
     teks TEXT,
-    FOREIGN KEY (id_add_on) REFERENCES Image(id_add_on)
+    FOREIGN KEY (id_add_on) REFERENCES AddOn(id_add_on)
 );
