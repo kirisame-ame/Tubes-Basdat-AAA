@@ -44,13 +44,27 @@ class LensSeeder:
 
     def seed_tipe_lensa_table(self):
         print("Seeding tipe_lensa...")
-        types = ["face", "background", "both", "none"]
+        types = ["face", "background"]
         tipe_lensa = []
         for id_lens in range(self.lens_count):
-            tipe = {
-                'id_lens': id_lens+1,
-                'tipe_lensa': faker.random_element(elements=types),
-            }
+            n_types = faker.random_int(min=0, max=5)
+            if n_types == 0:
+                continue
+            if n_types <3:
+                tipe = {
+                    'id_lens': id_lens+1,
+                    'tipe_lensa': faker.random_element(elements=types),
+                }
+            else:
+                tipe = {
+                    'id_lens': id_lens+1,
+                    'tipe_lensa': "face",
+                }
+                tipe2 ={
+                    'id_lens': id_lens+1,
+                    'tipe_lensa': "background",
+                }
+                tipe_lensa.append(tipe2)
             tipe_lensa.append(tipe)
         tipe_lensa_df = pd.DataFrame(tipe_lensa)
         for _, row in tipe_lensa_df.iterrows():
