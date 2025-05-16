@@ -203,7 +203,7 @@ class UserSeeder:
                 start = faker.date_between(start_date=current_start, end_date='today')
                 end = faker.date_between(start_date=start, end_date='today')
                 premium_entry = {
-                    # 'subscription_number' removed, let DB auto-increment
+                    'subscription_number': j + 1,
                     'id_user': i['id_user'],
                     'tanggal_subscribe': start,
                     'tanggal_expired': end,
@@ -217,10 +217,11 @@ class UserSeeder:
         for _, row in premium_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO Premium (id_user, tanggal_subscribe, tanggal_expired, status)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO Premium (subscription_number,id_user, tanggal_subscribe, tanggal_expired, status)
+                VALUES (%s,%s, %s, %s, %s)
                 """,
                 (
+                    row['subscription_number'],
                     row['id_user'],
                     row['tanggal_subscribe'],
                     row['tanggal_expired'],

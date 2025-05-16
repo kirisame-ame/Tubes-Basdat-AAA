@@ -16,14 +16,14 @@ class ContentSeeder:
                 if len(contents) >= FOREIGN_TABLE_ROWS:
                     break
                 n_contents = faker.random_int(min=0, max=5)
-                for _ in range(n_contents):
+                for n in range(n_contents):
                     if len(contents) >= FOREIGN_TABLE_ROWS:
                         break
                     date = faker.date_between(start_date=i['tanggal_bergabung'], end_date='today')
                     tipe = faker.random_element(['pap', 'chat'])
                     saved = faker.pybool()
                     content = {
-                        # 'urutan_pengiriman' will be set by DB (AUTO_INCREMENT)
+                        'urutan_pengiriman': n+1,
                         'id_room_chat': i['id_room_chat'],
                         'id_user': i['id_user'],
                         'waktu_pengiriman': date,
@@ -34,14 +34,14 @@ class ContentSeeder:
         content_df = pd.DataFrame(contents)
         self.content_count = len(contents)
         # Insert into the database and collect urutan_pengiriman
-        inserted_rows = []
         for _, row in content_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO Konten (id_room_chat, id_user, waktu_pengiriman, tipe_konten, disimpan)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO Konten (urutan_pengiriman,id_room_chat, id_user, waktu_pengiriman, tipe_konten, disimpan)
+                VALUES (%s,%s, %s, %s, %s, %s)
                 """,
                 (
+                    row['urutan_pengiriman'],
                     row['id_room_chat'],
                     row['id_user'],
                     row['waktu_pengiriman'],
@@ -49,12 +49,9 @@ class ContentSeeder:
                     row['disimpan']
                 )
             )
-            inserted_row = row.copy()
-            inserted_row['urutan_pengiriman'] = self.cursor.lastrowid
-            inserted_rows.append(inserted_row)
-        inserted_df = pd.DataFrame(inserted_rows)
-        self.seed_chat_table(inserted_df)
-        self.seed_pap_table(inserted_df, lens_count)
+            
+        self.seed_chat_table(content_df)
+        self.seed_pap_table(content_df, lens_count)
 
     def seed_chat_table(self, konten_table: pd.DataFrame):
         print("Seeding chat...")
@@ -125,32 +122,34 @@ class ContentSeeder:
         image_height = 3023
         image_width = 4032
         for _, i in pap_table.iterrows():
-            x_start = faker.random_int(min=0, max=image_width)
-            x_end = faker.random_int(min=x_start, max=image_width)
-            y_start = faker.random_int(min=0, max=image_height)
-            y_end = faker.random_int(min=y_start, max=image_height)
-            type = faker.random_element(['image', 'caption'])
-            add_on = {
-                # 'id_add_on' will be set by DB (AUTO_INCREMENT)
-                'urutan_pengiriman': i['urutan_pengiriman'],
-                'id_room_chat': i['id_room_chat'],
-                'id_user': i['id_user'],
-                'x_awal': x_start,
-                'x_akhir': x_end,
-                'y_awal': y_start,
-                'y_akhir': y_end,
-                'tipe_add_on': type,
-            }
-            add_ons.append(add_on)
+            n_add_ons = faker.random_int(min=0, max=3)
+            for n in range(n_add_ons):
+                x_start = faker.random_int(min=0, max=image_width)
+                x_end = faker.random_int(min=x_start, max=image_width)
+                y_start = faker.random_int(min=0, max=image_height)
+                y_end = faker.random_int(min=y_start, max=image_height)
+                type = faker.random_element(['image', 'caption'])
+                add_on = {
+                    'id_add_on': n+1,
+                    'urutan_pengiriman': i['urutan_pengiriman'],
+                    'id_room_chat': i['id_room_chat'],
+                    'id_user': i['id_user'],
+                    'x_awal': x_start,
+                    'x_akhir': x_end,
+                    'y_awal': y_start,
+                    'y_akhir': y_end,
+                    'tipe_add_on': type,
+                }
+                add_ons.append(add_on)
         add_on_df = pd.DataFrame(add_ons)
-        inserted_rows = []
         for _, row in add_on_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO AddOn (urutan_pengiriman, id_room_chat, id_user, x_awal, x_akhir, y_awal, y_akhir, tipe_add_on)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO AddOn (id_add_on,urutan_pengiriman, id_room_chat, id_user, x_awal, x_akhir, y_awal, y_akhir, tipe_add_on)
+                VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
+                    row['id_add_on'],
                     row['urutan_pengiriman'],
                     row['id_room_chat'],
                     row['id_user'],
@@ -161,12 +160,8 @@ class ContentSeeder:
                     row['tipe_add_on']
                 )
             )
-            inserted_row = row.copy()
-            inserted_row['id_add_on'] = self.cursor.lastrowid
-            inserted_rows.append(inserted_row)
-        inserted_df = pd.DataFrame(inserted_rows)
-        self.seed_image_table(inserted_df)
-        self.seed_caption_table(inserted_df)
+        self.seed_image_table(add_on_df)
+        self.seed_caption_table(add_on_df)
 
     def seed_caption_table(self, add_on_table: pd.DataFrame):
         print("Seeding caption...")
@@ -177,6 +172,9 @@ class ContentSeeder:
             if i['tipe_add_on'] == "caption":
                 caption = {
                     'id_add_on': i['id_add_on'],
+                    'urutan_pengiriman': i['urutan_pengiriman'],
+                    'id_room_chat': i['id_room_chat'],
+                    'id_user': i['id_user'],
                     'font_style': faker.random_element(fonts),
                     'teks': faker.text()
                 }
@@ -185,11 +183,14 @@ class ContentSeeder:
         for _, row in caption_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO Caption (id_add_on, font_style, teks)
-                VALUES (%s, %s, %s)
+                INSERT INTO Caption (id_add_on, urutan_pengiriman, id_room_chat, id_user, font_style, teks)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 """,
                 (
                     row['id_add_on'],
+                    row['urutan_pengiriman'],
+                    row['id_room_chat'],
+                    row['id_user'],
                     row['font_style'],
                     row['teks']
                 )
@@ -203,6 +204,9 @@ class ContentSeeder:
                 image_url = faker.image_url(width=640, height=480)
                 image = {
                     'id_add_on': i['id_add_on'],
+                    'urutan_pengiriman': i['urutan_pengiriman'],
+                    'id_room_chat': i['id_room_chat'],
+                    'id_user': i['id_user'],
                     'nama_image': image_url
                 }
                 images.append(image)
@@ -210,11 +214,14 @@ class ContentSeeder:
         for _, row in image_df.iterrows():
             self.cursor.execute(
                 """
-                INSERT INTO Image (id_add_on, nama_image)
-                VALUES (%s, %s)
+                INSERT INTO Image (id_add_on, urutan_pengiriman, id_room_chat, id_user, nama_image)
+                VALUES (%s, %s, %s, %s, %s)
                 """,
                 (
                     row['id_add_on'],
+                    row['urutan_pengiriman'],
+                    row['id_room_chat'],
+                    row['id_user'],
                     row['nama_image']
                 )
             )

@@ -59,7 +59,7 @@ CREATE TABLE TipeLensa (
 
 -- Tabel Premium
 CREATE TABLE Premium (
-    subscription_number INT AUTO_INCREMENT,
+    subscription_number INT NOT NULL,
     id_user INT NOT NULL,
     tanggal_subscribe DATE NOT NULL,
     tanggal_expired DATE NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE PapMap (
 
 -- Tabel Konten
 CREATE TABLE Konten (
-    urutan_pengiriman INT AUTO_INCREMENT NOT NULL,
+    urutan_pengiriman INT NOT NULL,
     id_room_chat INT NOT NULL,
     id_user INT NOT NULL,
     waktu_pengiriman TIMESTAMP NOT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE Pap (
 
 -- Tabel AddOn
 CREATE TABLE AddOn (
-    id_add_on INT AUTO_INCREMENT NOT NULL,
+    id_add_on INT NOT NULL,
     urutan_pengiriman INT NOT NULL,
     id_room_chat INT NOT NULL,
     id_user INT NOT NULL,
@@ -144,15 +144,25 @@ CREATE TABLE AddOn (
 
 -- Tabel Image
 CREATE TABLE Image (
-    id_add_on INT PRIMARY KEY NOT NULL,
+    id_add_on INT NOT NULL,
+    urutan_pengiriman INT NOT NULL,
+    id_room_chat INT NOT NULL,
+    id_user INT NOT NULL,
     nama_image VARCHAR(100),
-    FOREIGN KEY (id_add_on) REFERENCES AddOn(id_add_on)
+    PRIMARY KEY (id_add_on, urutan_pengiriman, id_room_chat, id_user),
+    FOREIGN KEY (id_add_on) REFERENCES AddOn(id_add_on),
+    FOREIGN KEY (urutan_pengiriman, id_room_chat, id_user) REFERENCES Konten(urutan_pengiriman, id_room_chat, id_user)
 );
 
 -- Tabel Caption
 CREATE TABLE Caption (
-    id_add_on INT PRIMARY KEY NOT NULL,
+    id_add_on INT NOT NULL,
+    urutan_pengiriman INT NOT NULL,
+    id_room_chat INT NOT NULL,
+    id_user INT NOT NULL,
     font_style VARCHAR(100),
     teks TEXT,
-    FOREIGN KEY (id_add_on) REFERENCES AddOn(id_add_on)
+    PRIMARY KEY (id_add_on, urutan_pengiriman, id_room_chat, id_user),
+    FOREIGN KEY (id_add_on) REFERENCES AddOn(id_add_on),
+    FOREIGN KEY (urutan_pengiriman, id_room_chat, id_user) REFERENCES Konten(urutan_pengiriman, id_room_chat, id_user)
 );

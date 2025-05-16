@@ -25,7 +25,7 @@ class LensSeeder:
             elif i['id_level'] == 2:
                 n_lenses = faker.random_int(min=20, max=29)
             elif i['id_level'] == 3:
-                n_lenses = faker.random_int(min=30, max=FOREIGN_TABLE_ROWS)
+                n_lenses = faker.random_int(min=30, max=50)
             for _ in range(n_lenses):
                 lens = {
                     'id_user': i['id_user'],
